@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#000814">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -17,22 +17,26 @@
       padding: 0;
       touch-action: none; /* Previene scroll o zoom accidental */
     }
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       background-color: #000814;
+      overflow: hidden;
+    }
+    body {
       color: #00ffcc;
       font-family: 'Courier New', Courier, monospace;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      overflow: hidden;
     }
     #game-container {
       position: relative;
       width: 100vw;
+      /* Usa dvh para adaptarse dinámicamente a las barras móviles */
       height: 100vh;
+      height: 100dvh;
       max-width: 440px;
-      max-height: 850px;
       background: radial-gradient(circle at center, #001122 0%, #000511 100%);
       border: 2px solid #00ffcc;
       box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
@@ -55,29 +59,34 @@
       display: block;
       width: 100%;
       height: 100%;
+      min-height: 0; /* Permite comprimirse para dar prioridad a los controles */
     }
+    /* Panel Ajustado con Safe Area Bottom para Celulares */
     #controls {
-      height: 110px;
+      height: auto;
+      min-height: 90px;
       background: #000d1a;
       border-top: 2px solid #00ffcc;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
+      padding: 10px 20px;
+      /* Evita que los botones queden tapados por la barra de gestos de iOS/Android */
+      padding-bottom: max(10px, env(safe-area-inset-bottom));
       z-index: 5;
     }
     .dpad {
       display: flex;
-      gap: 15px;
+      gap: 12px;
     }
     .btn-action {
-      width: 70px;
-      height: 70px;
+      width: 62px;
+      height: 62px;
       background: #001a33;
       border: 2px solid #00ffcc;
-      border-radius: 14px;
+      border-radius: 12px;
       color: #00ffcc;
-      font-size: 26px;
+      font-size: 24px;
       font-weight: bold;
       display: flex;
       justify-content: center;
@@ -91,13 +100,13 @@
       color: #000511;
     }
     .btn-fire {
-      width: 95px;
-      height: 70px;
+      width: 85px;
+      height: 62px;
       background: #33001a;
       border-color: #ff0066;
       color: #ff0066;
       box-shadow: 0 4px 0 #800033;
-      font-size: 18px;
+      font-size: 16px;
     }
     .btn-fire:active {
       background: #ff0066;
@@ -115,7 +124,7 @@
       z-index: 10;
     }
     .title {
-      font-size: 34px;
+      font-size: 32px;
       font-weight: 900;
       color: #ffcc00;
       text-shadow: 3px 3px #ff0066, -3px -3px #00ffcc;
@@ -136,8 +145,8 @@
       background: #ff0066;
       color: #fff;
       border: 2px solid #ffcc00;
-      padding: 15px 45px;
-      font-size: 20px;
+      padding: 14px 40px;
+      font-size: 18px;
       font-weight: bold;
       border-radius: 30px;
       box-shadow: 0 0 20px #ff0066;
@@ -170,7 +179,6 @@
   </div>
 
   <script>
-    // Registro del Service Worker para funcionamiento PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -365,7 +373,6 @@
       if (keys.left && player.x > 5) player.x -= player.speed;
       if (keys.right && player.x < canvas.width - player.width - 5) player.x += player.speed;
 
-      // Autodisparo continuo cómodo en móvil (cada 200ms)
       if (keys.fire && now - player.lastShoot > 200) {
         bullets.push({ x: player.x + 4, y: player.y, width: 3, height: 12 });
         bullets.push({ x: player.x + player.width - 7, y: player.y, width: 3, height: 12 });
@@ -389,7 +396,6 @@
         }
       });
 
-      // Efecto "Panic": la formación oscila más rápido con menos enemigos
       const panicFactor = 1 + (1 - enemies.length / 24) * 0.8;
       formationOffsetX += formationDir * (0.8 + level * 0.1) * panicFactor;
       if (Math.abs(formationOffsetX) > 35) {
@@ -397,7 +403,7 @@
       }
 
       const timeSinceStart = now - gameStartTime;
-      const gracePeriod = 3500; // 3.5s de preparación
+      const gracePeriod = 3500;
 
       if (timeSinceStart > gracePeriod) {
         const attackInterval = Math.max(2500 - level * 200, 700);
@@ -492,7 +498,6 @@
 
     function drawEnemy(e) {
       ctx.fillStyle = e.isDiving ? '#ffffff' : e.color;
-      // Animación de aleteo simple alternando fotograma cada 20 frames
       const wingOffset = Math.floor(frameCounter / 20) % 2 === 0 ? 0 : 2;
       
       ctx.fillRect(e.x + 6, e.y, 14, 20);
@@ -504,7 +509,6 @@
 
     function draw() {
       ctx.save();
-      // Aplica Screen Shake si la nave fue destruida
       if (shakeTimer > 0) {
         const dx = (Math.random() - 0.5) * 8;
         const dy = (Math.random() - 0.5) * 8;
@@ -530,7 +534,6 @@
       ctx.fillStyle = '#ff0066';
       ctx.fillText(`VIDAS: ${'♥'.repeat(lives)}`, canvas.width - 90, 22);
 
-      // Cartel parpadeante "GET READY!" durante el periodo de gracia
       const timeSinceStart = Date.now() - gameStartTime;
       if (timeSinceStart < 3500 && Math.floor(frameCounter / 15) % 2 === 0) {
         ctx.fillStyle = '#ffcc00';
