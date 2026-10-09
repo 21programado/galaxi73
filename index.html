@@ -179,11 +179,6 @@
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
-    }
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
