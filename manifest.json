@@ -1,7 +1,7 @@
 {
   "name": "Mini Galaxy Arcade",
   "short_name": "Galaxy",
-  "start_url": "./index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#000814",
   "theme_color": "#000814",

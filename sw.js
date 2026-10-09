@@ -1,4 +1,4 @@
-const CACHE_NAME = 'galaxy-arcade-v1';
+const CACHE_NAME = 'galaxy-arcade-v2';
 const ASSETS = [
   './',
   './index.html',
